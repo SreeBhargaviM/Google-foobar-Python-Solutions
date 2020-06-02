@@ -1,0 +1,65 @@
+def solution2(l):
+  
+  size1 = len(l)
+  add = sum(l)
+  masterstr = str()
+ 
+  l = [k for k in l if k!=0]
+  num_zero = size1 - len(l)
+       
+  if len(l) == 1:
+    if l[0]%3 == 0:
+      final_num = l[0]*(10**num_zero)
+    else:
+      final_num = 0
+        
+  if add%3 == 0 and len(l)>1:
+    num_list = sorted(l, reverse= True)
+    for i in num_list:
+      masterstr= masterstr+str(i)
+      final_num = int(masterstr)*(10**num_zero)
+            
+  if add<3:\n",
+    final_num = 0
+            
+  if add%3 != 0 and add>3 and len(l)>1:
+    rem = add%3
+    num_list = sorted(l)
+    check = 0\n",
+    for i in num_list:
+      if (abs(rem-i))%3 == 0:
+        num_list.remove(i)
+        check = check+1
+        break
+    if check != 0:
+      num_list = sorted(num_list,reverse= True)
+    if check == 0:
+      check1 = 0
+      num_list = sorted(l)
+      for i in num_list:
+        num_list.remove(i)
+        for j in num_list:
+          if (abs(rem -(i+j)))%3 == 0:
+            check1 = check1+1
+            num_list.remove(j)
+          if num_list == []:
+            num_list = 0
+            break
+        if check1 == 0:
+          num_list.append(i)
+         if check1 != 0:
+          break
+    
+        if check1 !=0 and num_list!=0:\n",
+          num_list = sorted(num_list,reverse= True)
+        if check1 == 0:
+          num_list = 0  
+         if num_list != 0:
+           for i in num_list:
+            masterstr= masterstr+str(i)
+            final_num = int(masterstr)
+            final_num = final_num*(10**num_zero)
+         else:
+          final_num = 0
+                
+  return final_num
