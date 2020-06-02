@@ -1,0 +1,51 @@
+def solution55(src, dest):
+
+  # Function to give all one-step destination node for each input node in list l
+  def k_node(l):
+    nodes = []
+    for j in l:
+      if j%8 == 0:
+        nodes = nodes+ [j+10,j+17,j-15,j-6]
+      elif (j-1)%8 == 0:
+        nodes = nodes+ [j+10,j+17,j+15,j-17,j-15,j-6]
+      elif (j+1)%8 == 0:
+        nodes = nodes+[j+15,j+6,j-10,j-17]
+      elif (j+2)%8 == 0:
+        nodes = nodes+[j+15,j+6,j+17,j-10,j-15,j-17]
+      else:
+        nodes = nodes + [j+10,j+17,j-10,j-17,j+6,j+15, j-6,j-15]
+        
+    nodes = [c for c in nodes if c>=0 and c<=63]
+    nodes = list(dict.fromkeys(nodes))
+    
+    return nodes
+    
+
+  a_in = [src]
+  check = 0
+  num = 0
+  nod_dir = []
+  
+  # Breadth first search
+  while check==0:
+    node = k_node(a_in)
+    if nod_dir !=[]:
+    #Removing nodes that have already been checked
+      for m in nod_dir:
+        for p in node:
+          if p==m:
+            node.remove(p)                 
+          for j in node:
+            if j == dest:
+              num = num+1
+              check = check+1
+              break
+            if check == 0:
+              num = num+1
+              a_in = node
+              nod_dir = nod_dir + node
+              
+  if src==dest:
+    num = 0
+    
+  return num
