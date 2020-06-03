@@ -1,0 +1,29 @@
+def solution(n):
+    #import numpy as np
+    
+#if the number is not divisble by 2, there are two options, add or subtract 1.
+#check to see if the quotient of n+/-1 is even or odd. Choose the option where
+#the quotient is even so you can divide it by 2 twice, making it easier to reach 1
+    
+    num = int(n)
+    count = 0
+    while num != 1:
+        if num%2 == 0:
+            num = num//2
+            count = count + 1
+        elif num%2 != 0:
+            if ((num+1)//2)%2 == 0 and num != 3:
+                num = num+1
+                count = count + 1
+            elif ((num-1)//2)%2 == 0 and num != 3:
+                num = num-1
+                count = count + 1
+                
+            # The above logic will add 1 to 3, but it is easier to reach 1 from 3
+            #by subtracting 1 from 3
+            elif num == 3:
+                num = num-1
+                count = count+1
+            
+        
+    return count
