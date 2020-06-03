@@ -1,0 +1,122 @@
+def solution(m):
+    
+    import numpy as np
+    from fractions import Fraction
+    
+    m = np.array(m)
+    if len(m) == 1: #for the [0] case
+        return [1,1]
+    
+    #finding indices of zero and non-zero rows
+    idx0 = []
+    idx1 = []
+    for i in range(len(m)): 
+        if sum(m[i,:]) == 0:
+            idx0.append(i)
+        else:
+            idx1.append(i)
+
+    #rearranging the matrix so all the zero rows are at the bottom
+    idx = idx1+idx0        
+    m2 = m[idx,:]
+    m = m2[:,idx]
+    
+    #extracting the shape of transition and absorbing matrices
+    #s-size of matrix
+    #r-number of absorbing states
+    #t-number of transition states
+    s = m.shape[0] 
+    r = np.sum(~m.any(1)) 
+    t = s-r 
+    b = []
+    m = m + Fraction() #to maintain fractional results
+    
+    #finding sum of each row
+    for i in range(t):
+        b.append(sum(m[i,:]))
+    
+    #adding probability=1 for absorbing states
+    #making it an identity matrix to get the canonical form
+    #this step is not necessary
+    for i in range(t,s):
+        m[i,i] = 1
+        b.append(1)
+    
+    b = np.array(b)
+    
+    b = b + Fraction()
+    
+    #dividing each row by sum of its elements to get probabilities
+    m = m/(b[:,None])
+    
+    #function to create an identity matrix in fraction form
+    def identitymat(size):
+        
+        imat = np.zeros((size,size)) + Fraction()
+        for i in range(size):
+            imat[i,i] = Fraction(1,1)
+        for i in range(size):
+            for j in range(size):
+                if i!=j:
+                    imat[i,j] = Fraction(0,1)
+        
+        return imat
+    
+    #function to get inverse of matrix using Gaussian elimination
+    def getinverse(m):
+        
+        s = m.shape[0]
+        m = m + Fraction()
+        
+        i = identitymat(s)
+        gauss1 = np.concatenate((m,i), axis=1)
+        
+        for j in range(s):
+            store1 = Fraction(gauss1[j,j].numerator,gauss1[j,j].denominator)
+            intermat = gauss1[:,j]
+            for k in range(2*s):
+                gauss1[j,k] = gauss1[j,k]/store1
+            for y in range(s):
+                store2 = Fraction(intermat[y].numerator,intermat[y].denominator)
+                for k in range(2*s):
+                    if y!=j:
+                        gauss1[y,k] = gauss1[y,k] - (gauss1[j,k]*store2)
+                    
+        
+        mat_inv = gauss1[:,s:2*s]       
+    
+        return mat_inv
+    
+    #transition matrix
+    q = m[0:t,0:t] + Fraction()
+    
+    #absorbing matrix
+    r_mat = m[0:t,t:s] + Fraction()
+    
+    #fundamental matrix
+    n = getinverse(identitymat(t)-q)  
+    
+    #absorption probabilities matrix
+    b = np.dot(n,r_mat)
+   
+    #required probabilities are the first row of b
+    fin = b[0,:]
+    
+    #finding lcm of denominators of the probabilities
+    num = 1
+    for d in fin:
+        denom = np.lcm(num,d.denominator)
+        num = denom
+        
+    #initialising an array to store final answers    
+    answer = np.zeros((len(fin)+1)) 
+    
+    #multiplying each element with numbers to make their denominator the lcm
+    for d in range(len(fin)):
+        answer[d] = (denom/fin[d].denominator)*fin[d].numerator
+    
+    #final element in the answer array should be the lcm
+    answer[len(fin)] = denom
+    
+    
+    return answer.astype(int)
