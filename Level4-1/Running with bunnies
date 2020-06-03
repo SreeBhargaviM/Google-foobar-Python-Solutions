@@ -1,0 +1,79 @@
+def solution(times, times_limit):
+    import numpy as np
+    times = np.array(times)
+    row = times.shape[0]
+    
+    # function to deploy the Floyd Warshall algorithm
+    def floydW(mat):
+        import copy
+        import numpy as np
+        r = mat.shape[0]
+        spath = copy.deepcopy(mat)
+        for k in range(r):
+            for i in range(r):
+                for j in range(r):
+                    if spath[i,k] + spath[k,j] < spath[i,j]:
+                        spath[i,j] = spath[i,k] + spath[k,j]
+        return spath
+    
+    # if you apply Floyd Warshall to an already optimised matrix,
+    # and the resultant matrix is not the same as the initial matrix,
+    # it indicates the presence of a negative weight cycle
+    
+    def checknegcycle(mat1):
+        import copy
+        c = mat1.shape[0]
+        checkmat = copy.deepcopy(mat1)
+        newmat = floydW(checkmat)
+        check = 0
+        for i in range(c):
+            for j in range(c):
+                if newmat[i,j] != checkmat[i,j]:
+                    check = check+1
+        if check!=0:
+            return 1
+        else:
+            return 0
+        
+    from itertools import chain, combinations
+    
+    #Function to find all subsets of bunnies
+    def powerset(iterable):
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    
+    def bunnies(mat3,t3):
+        from itertools import chain,permutations
+        n = len(mat3)-2
+        bunnyids = []
+        for num in range(n):
+            bunnyids.append(num)
+        pset = powerset(bunnyids)
+        pset = sorted(pset)
+    
+        optimal_bunnies = []
+        for sub in pset:
+            for permutation in permutations(sub):
+                subsum = 0
+                prev = 0
+                next1 = len(mat3)-1
+                for bunnyid in permutation:
+                    next1 = bunnyid+1
+                    subsum += mat3[prev][next1]
+                    prev = next1
+                subsum += mat3[prev][len(mat3)-1]
+                if subsum <= t3 and len(sub) > len(optimal_bunnies):
+                    optimal_bunnies = sub
+                    if len(optimal_bunnies) == n:
+                        break
+                else:
+                # Either rescue takes too long, or lexicographically lesser solution of same length exists.
+                    pass
+        return np.array(optimal_bunnies)
+        
+    stime = floydW(times)
+    negativ = checknegcycle(stime)
+    if negativ == 1:
+        return range(1,row-1)
+    if negativ == 0:
+        return bunnies(stime, times_limit)
