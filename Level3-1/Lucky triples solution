@@ -1,0 +1,28 @@
+def solution(l):
+    caches = []
+    count = []
+    n1 = 0
+    
+    # Finding the indices of all elements that will divide the ith element
+    for i in range(len(l)):
+        check = 0
+        cache = []
+        for j in range(0,i):
+            if l[i]%l[j] == 0:
+                check = check+1
+                cache.append(j)
+
+        count.append(check)
+        caches.append(cache)
+    num = 0
+    
+    # Calculating number of lucky triples with the ith element as the biggest number in the triple
+    for i in range(2,len(l)):
+        for j in caches[i]:
+            if caches[j] == []:
+                length = 0
+            else:
+                length = len(caches[j])
+            num = num+length
+    
+    return num
