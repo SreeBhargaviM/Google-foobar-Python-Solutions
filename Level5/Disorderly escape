@@ -1,0 +1,64 @@
+def sum_num(num,sum):
+  poly = []
+  if sum>0:
+    for m in range(num,0,-1):
+      if m == 1:
+        poly.append([(1,sum)])
+      else:
+        for x in range(int(sum/m),0,-1):
+          inter = sum_num(m-1,sum-(m*x))
+          if len(inter) == 0:
+            poly.append([(m,x)])
+          #else:
+          for elem in inter:
+            poly.append([(m,x)]+elem)
+  return poly
+def cycle_ind(nums):
+  from fractions import Fraction  
+  val = []
+  from math import factorial
+  for i in nums:
+    s1 = 1
+    for b in i:
+      s1 = s1*factorial(b[1])*(b[0]**b[1])
+    val.append(Fraction(1,s1))
+  return val
+  
+def cycle_comb(row_t, col_t, row_cycle, col_cycle):
+  import numpy as np
+  rowlen = len(row_t)
+  collen = len(col_t)
+  coeff = []
+  terms = []
+  for i in range(rowlen):
+    for j in range(collen):
+      coeff.append(row_cycle[i]*col_cycle[j])
+      inter_terms = []
+      for t in row_t[i]:
+        for u in col_t[j]:
+          lcm = t[0]*u[0]/np.gcd(t[0],u[0])
+          inter_terms.append((lcm,int(t[0]*t[1]*u[0]*u[1]/lcm)))
+      terms.append(inter_terms)
+  return coeff, terms
+
+def solution(w,h,s):
+  w_perm = sum_num(w,w)
+  h_perm = sum_num(h,h)
+
+  w_cycle = cycle_ind(w_perm)
+  h_cycle = cycle_ind(h_perm)
+
+  fin_coeff, fin_terms = cycle_comb(w_perm, h_perm, w_cycle, h_cycle)
+  powers = []
+  for term in fin_terms:
+    powr = 0
+    for pair in term:
+      powr = powr+pair[1]
+    powers.append(powr)
+  fin = 0
+  numb = len(powers)
+  for i in range(numb):
+    fin = fin + ((s**powers[i])*fin_coeff[i])
+    fin1 = int(fin)
+
+  return str(fin1)
